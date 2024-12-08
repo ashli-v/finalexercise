@@ -58,6 +58,11 @@
             border-radius: 5px;
             text-align: left;
         }
+        .chart {
+            margin: 20px auto;
+            width: 80%;
+            height: 400px;
+        }
         button {
             margin-top: 15px;
             padding: 10px 20px;
@@ -72,6 +77,7 @@
             background-color: #555;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Writing Comparison Tool</h1>
@@ -88,6 +94,7 @@
     <div class="results">
         <button onclick="analyzeText()">Analyze</button>
         <pre id="analysis-result"></pre>
+        <canvas id="wordFrequencyChart" class="chart"></canvas>
     </div>
 
     <script>
@@ -113,6 +120,9 @@
                            `Similarity Score: ${similarity}%`;
 
             document.getElementById('analysis-result').textContent = result;
+
+            const wordFrequency = getWordFrequency(text1 + ' ' + text2);
+            renderWordFrequencyChart(wordFrequency);
         }
 
         function analyzeSentiment(text) {
@@ -140,6 +150,50 @@
             const union = new Set([...words1, ...words2]);
 
             return ((intersection.size / union.size) * 100).toFixed(2);
+        }
+
+        function getWordFrequency(text) {
+            const words = text.toLowerCase().split(/\s+/).filter(word => word);
+            const frequency = {};
+
+            words.forEach(word => {
+                frequency[word] = (frequency[word] || 0) + 1;
+            });
+
+            return Object.entries(frequency).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        }
+
+        function renderWordFrequencyChart(frequency) {
+            const ctx = document.getElementById('wordFrequencyChart').getContext('2d');
+            const labels = frequency.map(entry => entry[0]);
+            const data = frequency.map(entry => entry[1]);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Word Frequency',
+                        data: data,
+                        backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
