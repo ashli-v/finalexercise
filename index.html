@@ -82,34 +82,60 @@
         </div>
     </div>
     <div class="results">
-        <button onclick="compareText()">Compare</button>
-        <pre id="comparison-result"></pre>
+        <button onclick="analyzeText()">Analyze</button>
+        <pre id="analysis-result"></pre>
     </div>
 
     <script>
-        function compareText() {
+        function analyzeText() {
             const text1 = document.getElementById('text1').value;
             const text2 = document.getElementById('text2').value;
 
             if (!text1 || !text2) {
-                document.getElementById('comparison-result').textContent = "Please enter text in both fields to compare.";
+                document.getElementById('analysis-result').textContent = "Please enter text in both fields to analyze.";
                 return;
             }
 
-            const diff = [];
-            const text1Words = text1.split(/\s+/);
-            const text2Words = text2.split(/\s+/);
-            
-            const maxLength = Math.max(text1Words.length, text2Words.length);
-            for (let i = 0; i < maxLength; i++) {
-                if (text1Words[i] !== text2Words[i]) {
-                    diff.push(`[Word ${i + 1}] \n- Text1: "${text1Words[i] || "(None)"}"\n- Text2: "${text2Words[i] || "(None)"}"`);
-                }
-            }
+            const wordCount1 = text1.split(/\s+/).filter(word => word).length;
+            const wordCount2 = text2.split(/\s+/).filter(word => word).length;
 
-            document.getElementById('comparison-result').textContent = diff.length
-                ? diff.join("\n\n")
-                : "The two pieces of writing are identical.";
+            const sentiment1 = analyzeSentiment(text1);
+            const sentiment2 = analyzeSentiment(text2);
+
+            const similarity = calculateSimilarity(text1, text2);
+
+            const result = `Word Count:\n- Text1: ${wordCount1}\n- Text2: ${wordCount2}\n\n` +
+                           `Sentiment Analysis:\n- Text1: ${sentiment1}\n- Text2: ${sentiment2}\n\n` +
+                           `Similarity Score: ${similarity}%`;
+
+            document.getElementById('analysis-result').textContent = result;
+        }
+
+        function analyzeSentiment(text) {
+            const positiveWords = ["good", "happy", "excellent", "positive", "success", "joy", "wonderful"];
+            const negativeWords = ["bad", "sad", "terrible", "negative", "failure", "pain", "awful"];
+
+            let score = 0;
+            const words = text.toLowerCase().split(/\s+/);
+
+            words.forEach(word => {
+                if (positiveWords.includes(word)) score++;
+                if (negativeWords.includes(word)) score--;
+            });
+
+            if (score > 0) return "Positive";
+            if (score < 0) return "Negative";
+            return "Neutral";
+        }
+
+        function calculateSimilarity(text1, text2) {
+            const words1 = new Set(text1.toLowerCase().split(/\s+/));
+            const words2 = new Set(text2.toLowerCase().split(/\s+/));
+
+            const intersection = new Set([...words1].filter(word => words2.has(word)));
+            const union = new Set([...words1, ...words2]);
+
+            return ((intersection.size / union.size) * 100).toFixed(2);
         }
     </script>
 </body>
