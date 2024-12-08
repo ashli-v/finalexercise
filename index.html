@@ -154,7 +154,7 @@
 
         function getWordFrequency(text) {
             const stopWords = new Set(["a", "an", "and", "the", "is", "in", "it", "of", "to", "for", "on", "with", "this", "that", "at", "by", "from", "as", "are", "was", "were", "be", "been", "will", "or"]);
-            const words = text.toLowerCase().split(/\s+/).filter(word => word && !stopWords.has(word));
+            const words = text.toLowerCase().split(/\W+/).filter(word => word && !stopWords.has(word));
             const frequency = {};
 
             words.forEach(word => {
