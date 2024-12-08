@@ -28,7 +28,7 @@
         .input-section {
             width: 45%;
             background-color: #fff;
-            border: 1px solid #484646;
+            border: 1px solid #ccc;
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -153,7 +153,8 @@
         }
 
         function getWordFrequency(text) {
-            const words = text.toLowerCase().split(/\s+/).filter(word => word);
+            const stopWords = new Set(["a", "an", "and", "the", "is", "in", "it", "of", "to", "for", "on", "with", "this", "that", "at", "by", "from", "as", "are", "was", "were", "be", "been", "will", "or"]);
+            const words = text.toLowerCase().split(/\s+/).filter(word => word && !stopWords.has(word));
             const frequency = {};
 
             words.forEach(word => {
